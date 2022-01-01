@@ -23,14 +23,14 @@ jobs:
       uses: docker/login-action@v1
       with:
         registry: https://acraudaxmysqlstg.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_70d3794f0d1b4dda9f45a83350024fb0 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_8464e67a6db84099b1c96afb39969801 }}
+        username: ${{ secrets.AzureAppService_ContainerUsername_b2d54e1bc18f4f3ab338227e8aeb7b45 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_5cbb7e98bcb14954bea2340235a817dd }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: acraudaxmysqlstg.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_70d3794f0d1b4dda9f45a83350024fb0 }}/strapimysql:${{ github.sha }}
+        tags: acraudaxmysqlstg.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_b2d54e1bc18f4f3ab338227e8aeb7b45 }}/mcr.microsoft.com/appsvc/staticsite:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -47,5 +47,5 @@ jobs:
       with:
         app-name: 'audax-strapi-stg'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_9526f964e6ff4141b9dc09d8066b3923 }}
-        images: 'acraudaxmysqlstg.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_70d3794f0d1b4dda9f45a83350024fb0 }}/strapimysql:${{ github.sha }}'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_96bb5317196f46c3abd985a357494668 }}
+        images: 'acraudaxmysqlstg.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_b2d54e1bc18f4f3ab338227e8aeb7b45 }}/mcr.microsoft.com/appsvc/staticsite:${{ github.sha }}'
