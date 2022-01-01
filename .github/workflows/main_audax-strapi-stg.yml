@@ -1,0 +1,51 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy container app to Azure Web App - audax-strapi-stg
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Log in to registry
+      uses: docker/login-action@v1
+      with:
+        registry: https://acraudaxmysqlstg.azurecr.io/
+        username: ${{ secrets.AzureAppService_ContainerUsername_70d3794f0d1b4dda9f45a83350024fb0 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_8464e67a6db84099b1c96afb39969801 }}
+
+    - name: Build and push container image to registry
+      uses: docker/build-push-action@v2
+      with:
+        push: true
+        tags: acraudaxmysqlstg.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_70d3794f0d1b4dda9f45a83350024fb0 }}/strapimysql:${{ github.sha }}
+        file: ./Dockerfile
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'audax-strapi-stg'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_9526f964e6ff4141b9dc09d8066b3923 }}
+        images: 'acraudaxmysqlstg.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_70d3794f0d1b4dda9f45a83350024fb0 }}/strapimysql:${{ github.sha }}'
